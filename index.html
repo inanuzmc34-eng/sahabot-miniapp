@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Saha Yönetim Dashboard</title>
+    
+    <!-- Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Premium Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app" v-cloak>
+        <!-- Güvenlik Ekranı (Telegram Dışı Giriş) -->
+        <div v-if="!isTelegramEnv && !devMode" class="auth-blocker">
+            <div class="glass-card full-center">
+                <div class="icon-warning">⚠️</div>
+                <h2>Erişim Engellendi</h2>
+                <p>Güvenlik politikası gereği bu uygulamaya tarayıcı üzerinden giriş yapılamaz.</p>
+                <p>Lütfen uygulamayı Telegram üzerinden açın.</p>
+            </div>
+        </div>
+
+        <!-- Yükleniyor Ekranı -->
+        <div v-else-if="isLoading" class="loader-container full-center">
+            <div class="spinner"></div>
+            <p>Saha Verileri Yükleniyor...</p>
+        </div>
+
+        <!-- Ana Uygulama -->
+        <div v-else class="app-container">
+            
+            <!-- Navbar -->
+            <nav class="glass-nav">
+                <div class="nav-brand">
+                    <span class="emoji-logo">🏗️</span>
+                    <span class="brand-text">Saha<span class="gradient-text">Pro</span></span>
+                </div>
+                <!-- Tabs -->
+                <div class="nav-tabs">
+                    <button :class="['tab-btn', { active: currentTab === 'form' }]" @click="currentTab = 'form'">
+                        📝 Kayıt
+                    </button>
+                    <button :class="['tab-btn', { active: currentTab === 'dashboard' }]" @click="currentTab = 'dashboard'">
+                        📊 Durum
+                    </button>
+                    <button v-if="isAdmin" :class="['tab-btn', { active: currentTab === 'admin' }]" @click="currentTab = 'admin'">
+                        ⚙️ Admin
+                    </button>
+                </div>
+                <!-- Profile Pic / Name (Telegram data) -->
+                <div class="nav-profile">
+                    <img v-if="user.photo_url" :src="user.photo_url" alt="Avatar">
+                    <div class="user-info">
+                        <strong>{{ user.first_name || 'Misafir' }}</strong>
+                        <span class="user-role">{{ roleText }}</span>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- İçerik Alanı -->
+            <main class="content-area glass-panel">
+                
+                <!-- SEKME 1: Form (Kayıt) -->
+                <section v-show="currentTab === 'form'" class="fade-enter">
+                    <h2 class="section-title">Hızlı Veri Girişi</h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Kategori</label>
+                            <select v-model="form.kategori">
+                                <option value="" disabled>Lütfen Seçiniz</option>
+                                <option value="ilerleme">📊 İlerleme / Metraj</option>
+                                <option value="puantaj">👷 Puantaj / Yevmiye</option>
+                                <option value="sorun">⚠️ Sorun / NCR Bildirimi</option>
+                                <option value="beton">🏗 Beton Dökümü</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Blok Seçimi</label>
+                            <select v-model="form.blok">
+                                <option value="" disabled>Lütfen Seçiniz</option>
+                                <option v-for="b in refs.bloklar" :key="b" :value="b">{{ b }}</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Kat Seçimi</label>
+                            <select v-model="form.kat">
+                                <option value="" disabled>Lütfen Seçiniz</option>
+                                <option v-for="k in refs.katlar" :key="k" :value="k">{{ k }}</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>İmalat / İş Kalemi</label>
+                            <select v-model="form.imalat">
+                                <option value="" disabled>İsteğe Bağlı</option>
+                                <option v-for="i in refs.imalatlar" :key="i" :value="i">{{ i }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width" style="margin-top: 20px;">
+                        <label>Miktar ve Açıklama</label>
+                        <textarea v-model="form.miktar" placeholder="Örn: 22 m3 C30 Beton veya 5 Demirci..."></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Fotoğraf Eki (Orijinal Kayıt)</label>
+                        <div class="photo-upload" :class="{ 'has-file': photoFile }" @click="$refs.fileInput.click()">
+                            <span v-if="!photoFile">📸 Tıklayın: Kanıt / Durum Fotoğrafı Yükle</span>
+                            <span v-else>✅ Dosya Eklendi: {{ photoFile.name }} (Değiştir)</span>
+                        </div>
+                        <input type="file" ref="fileInput" accept="image/*" @change="handleFileUpload" style="display: none;">
+                    </div>
+
+                    <button class="btn-primary" @click="submitForm">
+                        <span class="btn-text">Veriyi Telegram ile İlet</span>
+                        <div class="btn-glow"></div>
+                    </button>
+                    
+                    <div v-if="!isOnline" class="offline-badge">
+                        ⚠️ Ağ bağlantısı zayıf. Şebeke bağlanınca gönderilecek.
+                    </div>
+                </section>
+
+                <!-- SEKME 2: Dashboard -->
+                <section v-show="currentTab === 'dashboard'" class="fade-enter">
+                    <h2 class="section-title">Anlık Saha Durumu (Özet)</h2>
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <span class="kpi-value text-blue">214</span>
+                            <span class="kpi-label">Aktif Personel</span>
+                        </div>
+                        <div class="kpi-card">
+                            <span class="kpi-value text-green">14</span>
+                            <span class="kpi-label">Günlük İlerleme (m3/m2)</span>
+                        </div>
+                        <div class="kpi-card">
+                            <span class="kpi-value text-red">3</span>
+                            <span class="kpi-label">Açık Sorun (NCR)</span>
+                        </div>
+                    </div>
+
+                    <div class="coming-soon">
+                        <h3>Power BI Dashboard Entegrasyonu</h3>
+                        <p>Excel bağlantılı canlı grafikler bu ekranda görüntülenecektir.</p>
+                    </div>
+                </section>
+
+                <!-- SEKME 3: Admin Paneli (Sadece Şefler) -->
+                <section v-show="currentTab === 'admin' && isAdmin" class="fade-enter">
+                    <h2 class="section-title">Kullanıcı Yönetimi ve İzinler</h2>
+                    <p class="subtitle">Bu alanı sadece şantiye yetkilileri görüntüleyebilir.</p>
+
+                    <div class="user-list-card">
+                        <div class="toolbar">
+                            <h3>Personel & Taşeron Listesi</h3>
+                            <button class="btn-secondary" @click="fetchUsers">Yenile</button>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th>Ad Soyad</th>
+                                        <th>Telegram ID</th>
+                                        <th>Şantiye Rolü</th>
+                                        <th>Kayıt Onayı</th>
+                                        <th>İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(u, id) in adminUsers" :key="id">
+                                        <td>{{ u.name }}</td>
+                                        <td class="text-mono">{{ id }}</td>
+                                        <td>
+                                            <select v-model="u.role" @change="updateRole(id, u.role)">
+                                                <option value="SEF">Şantiye Şefi</option>
+                                                <option value="MUD">Proje Müdürü</option>
+                                                <option value="TAS">Taşeron Temsilcisi</option>
+                                                <option value="UST">Kalfa / Usta</option>
+                                                <option value="ISG">İSG Uzmanı</option>
+                                                <option value="KAL">Kalite Kontrol</option>
+                                                <option value="BEKLEYEN">Rol Bekleyen</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <span :class="u.approved ? 'status-green' : 'status-yellow'">
+                                                {{ u.approved ? 'Aktif' : 'Onay Bekliyor' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button v-if="!u.approved" class="btn-micro-green" @click="approveUser(id)">Onayla</button>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="Object.keys(adminUsers).length === 0">
+                                        <td colspan="5" class="text-center text-muted">Ağdan veri çekiliyor...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

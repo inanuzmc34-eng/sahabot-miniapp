@@ -1,0 +1,60 @@
+{
+  "bloklar": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "ORTAK",
+    "TUM_SAHA"
+  ],
+  "katlar": [
+    "TM",
+    "B2",
+    "B1",
+    "ZM",
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "CT"
+  ],
+  "taseronlar": [
+    "Ozkan Insaat",
+    "Yilmaz Kalip",
+    "Demir-Is",
+    "Duvarci Ahmet",
+    "Izolasyon Ltd",
+    "Ince-Is Dekorasyon",
+    "Elektro-Tek",
+    "Mekano Tesisat",
+    "Cephe Sistemleri AS",
+    "Yesil Peyzaj"
+  ],
+  "imalatlar": [
+    "[KABA] Kalip",
+    "[KABA] Demir",
+    "[KABA] Beton",
+    "[INCE] Duvar",
+    "[INCE] Siva",
+    "[INCE] Seramik",
+    "[INCE] Boya",
+    "[MEK] Pis Su",
+    "[MEK] Temiz Su",
+    "[ELK] Kablo Cekimi",
+    "[ELK] Tava"
+  ],
+  "kategoriler": [
+    "Altyapi",
+    "Cephe",
+    "Duvar",
+    "Elektrik",
+    "Ince Is",
+    "Islak Hacim",
+    "Kaba Yapi",
+    "Kapi/Pencere",
+    "Mekanik",
+    "Peyzaj",
+    "Yalitim"
+  ]
+}
