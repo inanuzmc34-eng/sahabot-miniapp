@@ -1,60 +1,678 @@
 {
+  "_meta": {
+    "kaynak": "00-referans.xlsx",
+    "guncelleme": "2026-04-01T03:07:56",
+    "not": "Bu dosyayi elle duzenleme. generate_refs.py ile uretilir."
+  },
   "bloklar": [
     "A",
     "B",
     "C",
     "D",
-    "ORTAK",
-    "TUM_SAHA"
+    "ORTAK"
   ],
   "katlar": [
-    "TM",
-    "B2",
-    "B1",
-    "ZM",
     "01",
     "02",
     "03",
     "04",
     "05",
-    "CT"
+    "06",
+    "07",
+    "08",
+    "B1",
+    "B2",
+    "CT",
+    "ZM"
   ],
   "taseronlar": [
-    "Ozkan Insaat",
-    "Yilmaz Kalip",
-    "Demir-Is",
-    "Duvarci Ahmet",
-    "Izolasyon Ltd",
-    "Ince-Is Dekorasyon",
-    "Elektro-Tek",
-    "Mekano Tesisat",
-    "Cephe Sistemleri AS",
-    "Yesil Peyzaj"
+    {
+      "kod": "TAS-001",
+      "ad": "Yilmaz Kalip",
+      "isKalemi": "Kalip"
+    },
+    {
+      "kod": "TAS-002",
+      "ad": "Ozkan Insaat",
+      "isKalemi": "Beton Dokumu"
+    },
+    {
+      "kod": "TAS-003",
+      "ad": "Demir-Is",
+      "isKalemi": "Demir Isleri"
+    },
+    {
+      "kod": "TAS-004",
+      "ad": "Guven Tesisat",
+      "isKalemi": "Mekanik Tesisat"
+    },
+    {
+      "kod": "TAS-005",
+      "ad": "Elektrik Pro",
+      "isKalemi": "Elektrik"
+    },
+    {
+      "kod": "TAS-006",
+      "ad": "Ince Isler Ltd.",
+      "isKalemi": "Siva/Fayans"
+    }
   ],
-  "imalatlar": [
-    "[KABA] Kalip",
-    "[KABA] Demir",
-    "[KABA] Beton",
-    "[INCE] Duvar",
-    "[INCE] Siva",
-    "[INCE] Seramik",
-    "[INCE] Boya",
-    "[MEK] Pis Su",
-    "[MEK] Temiz Su",
-    "[ELK] Kablo Cekimi",
-    "[ELK] Tava"
+  "makineler": [
+    {
+      "kod": "VNC-01",
+      "ad": "Kule Vinci 1",
+      "tip": "Kule Vinci"
+    },
+    {
+      "kod": "EKS-01",
+      "ad": "Ekskavatör 1",
+      "tip": "Ekskavatör"
+    },
+    {
+      "kod": "PMP-01",
+      "ad": "Beton Pompası 1",
+      "tip": "Beton Pompasi"
+    },
+    {
+      "kod": "FRK-01",
+      "ad": "Forklift 1",
+      "tip": "Forklift"
+    }
+  ],
+  "malzemeler": [
+    {
+      "kod": "KB-BT-C25",
+      "ad": "Hazir Beton C25",
+      "birim": "m3",
+      "kategori": "Beton"
+    },
+    {
+      "kod": "KB-BT-C30",
+      "ad": "Hazir Beton C30",
+      "birim": "m3",
+      "kategori": "Beton"
+    },
+    {
+      "kod": "KB-BT-C35",
+      "ad": "Hazir Beton C35",
+      "birim": "m3",
+      "kategori": "Beton"
+    },
+    {
+      "kod": "KB-DM-8",
+      "ad": "Celik Φ8",
+      "birim": "ton",
+      "kategori": "Demir"
+    },
+    {
+      "kod": "KB-DM-10",
+      "ad": "Celik Φ10",
+      "birim": "ton",
+      "kategori": "Demir"
+    },
+    {
+      "kod": "KB-DM-12",
+      "ad": "Celik Φ12",
+      "birim": "ton",
+      "kategori": "Demir"
+    },
+    {
+      "kod": "KB-DM-16",
+      "ad": "Celik Φ16",
+      "birim": "ton",
+      "kategori": "Demir"
+    },
+    {
+      "kod": "KB-KLP-KNT",
+      "ad": "Kalip Kontraplak 18mm",
+      "birim": "m2",
+      "kategori": "Kalip"
+    },
+    {
+      "kod": "IY-CMT-PCE",
+      "ad": "Cimento CEM I 42.5",
+      "birim": "torba",
+      "kategori": "Baglayici"
+    },
+    {
+      "kod": "IY-KUM-INS",
+      "ad": "Kum Ince",
+      "birim": "m3",
+      "kategori": "Agrega"
+    },
+    {
+      "kod": "IY-MCI-016",
+      "ad": "Micir 0-16",
+      "birim": "m3",
+      "kategori": "Agrega"
+    },
+    {
+      "kod": "IY-TUG-001",
+      "ad": "Tugla 19x19x8.5",
+      "birim": "adet",
+      "kategori": "Duvar"
+    },
+    {
+      "kod": "IY-GZB-200",
+      "ad": "Gazbeton 20cm",
+      "birim": "m2",
+      "kategori": "Duvar"
+    }
   ],
   "kategoriler": [
-    "Altyapi",
-    "Cephe",
-    "Duvar",
-    "Elektrik",
-    "Ince Is",
-    "Islak Hacim",
-    "Kaba Yapi",
-    "Kapi/Pencere",
-    "Mekanik",
-    "Peyzaj",
-    "Yalitim"
-  ]
+    {
+      "kod": "01",
+      "ad": "Kaba Yapi"
+    },
+    {
+      "kod": "02",
+      "ad": "Ince Yapi"
+    },
+    {
+      "kod": "03",
+      "ad": "Mekanik Tesisat"
+    },
+    {
+      "kod": "04",
+      "ad": "Elektrik Tesisat"
+    },
+    {
+      "kod": "05",
+      "ad": "Dis Cephe"
+    },
+    {
+      "kod": "06",
+      "ad": "Peyzaj"
+    },
+    {
+      "kod": "07",
+      "ad": "Altyapi"
+    },
+    {
+      "kod": "08",
+      "ad": "ISG"
+    },
+    {
+      "kod": "09",
+      "ad": "Kalite"
+    }
+  ],
+  "isKalemleri": [
+    {
+      "poz": "01.001",
+      "ad": "Kalip",
+      "birim": "m2",
+      "kategoriKod": "01",
+      "kategori": "Kaba Yapi"
+    },
+    {
+      "poz": "01.002",
+      "ad": "Kalip Kurulum",
+      "birim": "gun",
+      "kategoriKod": "01",
+      "kategori": "Kaba Yapi"
+    },
+    {
+      "poz": "01.003",
+      "ad": "Kalip Sokum",
+      "birim": "gun",
+      "kategoriKod": "01",
+      "kategori": "Kaba Yapi"
+    },
+    {
+      "poz": "01.004",
+      "ad": "Demir",
+      "birim": "ton",
+      "kategoriKod": "01",
+      "kategori": "Kaba Yapi"
+    },
+    {
+      "poz": "01.005",
+      "ad": "Demir Hazirlama",
+      "birim": "gun",
+      "kategoriKod": "01",
+      "kategori": "Kaba Yapi"
+    },
+    {
+      "poz": "01.006",
+      "ad": "Demir Baglama",
+      "birim": "gun",
+      "kategoriKod": "01",
+      "kategori": "Kaba Yapi"
+    },
+    {
+      "poz": "01.007",
+      "ad": "Beton Dokumu",
+      "birim": "m3",
+      "kategoriKod": "01",
+      "kategori": "Kaba Yapi"
+    },
+    {
+      "poz": "01.008",
+      "ad": "Beton Pompaj",
+      "birim": "m3",
+      "kategoriKod": "01",
+      "kategori": "Kaba Yapi"
+    },
+    {
+      "poz": "01.009",
+      "ad": "Kagir Duvar",
+      "birim": "m2",
+      "kategoriKod": "01",
+      "kategori": "Kaba Yapi"
+    },
+    {
+      "poz": "01.010",
+      "ad": "Hafriyat",
+      "birim": "m3",
+      "kategoriKod": "01",
+      "kategori": "Kaba Yapi"
+    },
+    {
+      "poz": "01.011",
+      "ad": "Dolgu",
+      "birim": "m3",
+      "kategoriKod": "01",
+      "kategori": "Kaba Yapi"
+    },
+    {
+      "poz": "02.001",
+      "ad": "Tugla Duvar",
+      "birim": "m2",
+      "kategoriKod": "02",
+      "kategori": "Ince Yapi"
+    },
+    {
+      "poz": "02.002",
+      "ad": "Gazbeton Duvar",
+      "birim": "m2",
+      "kategoriKod": "02",
+      "kategori": "Ince Yapi"
+    },
+    {
+      "poz": "02.003",
+      "ad": "Siva (Ic)",
+      "birim": "m2",
+      "kategoriKod": "02",
+      "kategori": "Ince Yapi"
+    },
+    {
+      "poz": "02.004",
+      "ad": "Siva (Dis)",
+      "birim": "m2",
+      "kategoriKod": "02",
+      "kategori": "Ince Yapi"
+    },
+    {
+      "poz": "02.005",
+      "ad": "Seramik Doseme",
+      "birim": "m2",
+      "kategoriKod": "02",
+      "kategori": "Ince Yapi"
+    },
+    {
+      "poz": "02.006",
+      "ad": "Fayans",
+      "birim": "m2",
+      "kategoriKod": "02",
+      "kategori": "Ince Yapi"
+    },
+    {
+      "poz": "02.007",
+      "ad": "Ic Boya",
+      "birim": "m2",
+      "kategoriKod": "02",
+      "kategori": "Ince Yapi"
+    },
+    {
+      "poz": "02.008",
+      "ad": "Sap",
+      "birim": "m2",
+      "kategoriKod": "02",
+      "kategori": "Ince Yapi"
+    },
+    {
+      "poz": "02.009",
+      "ad": "Parke/Laminat",
+      "birim": "m2",
+      "kategoriKod": "02",
+      "kategori": "Ince Yapi"
+    },
+    {
+      "poz": "02.010",
+      "ad": "Asma Tavan",
+      "birim": "m2",
+      "kategoriKod": "02",
+      "kategori": "Ince Yapi"
+    },
+    {
+      "poz": "02.011",
+      "ad": "Kapi Montaji",
+      "birim": "adet",
+      "kategoriKod": "02",
+      "kategori": "Ince Yapi"
+    },
+    {
+      "poz": "02.012",
+      "ad": "Pencere Montaji",
+      "birim": "adet",
+      "kategoriKod": "02",
+      "kategori": "Ince Yapi"
+    },
+    {
+      "poz": "02.013",
+      "ad": "Mermer/Granit",
+      "birim": "m2",
+      "kategoriKod": "02",
+      "kategori": "Ince Yapi"
+    },
+    {
+      "poz": "03.001",
+      "ad": "Sihhi Tesisat",
+      "birim": "daire",
+      "kategoriKod": "03",
+      "kategori": "Mekanik Tesisat"
+    },
+    {
+      "poz": "03.002",
+      "ad": "Isitma Sistemi",
+      "birim": "daire",
+      "kategoriKod": "03",
+      "kategori": "Mekanik Tesisat"
+    },
+    {
+      "poz": "03.003",
+      "ad": "Sogutma/Klima",
+      "birim": "daire",
+      "kategoriKod": "03",
+      "kategori": "Mekanik Tesisat"
+    },
+    {
+      "poz": "03.004",
+      "ad": "Havalandirma",
+      "birim": "m2",
+      "kategoriKod": "03",
+      "kategori": "Mekanik Tesisat"
+    },
+    {
+      "poz": "03.005",
+      "ad": "Yangin Tesisat",
+      "birim": "m2",
+      "kategoriKod": "03",
+      "kategori": "Mekanik Tesisat"
+    },
+    {
+      "poz": "03.006",
+      "ad": "Asansor Montaj",
+      "birim": "adet",
+      "kategoriKod": "03",
+      "kategori": "Mekanik Tesisat"
+    },
+    {
+      "poz": "04.001",
+      "ad": "Kuvvetli Akim",
+      "birim": "daire",
+      "kategoriKod": "04",
+      "kategori": "Elektrik Tesisat"
+    },
+    {
+      "poz": "04.002",
+      "ad": "Zayif Akim",
+      "birim": "daire",
+      "kategoriKod": "04",
+      "kategori": "Elektrik Tesisat"
+    },
+    {
+      "poz": "04.003",
+      "ad": "Aydinlatma",
+      "birim": "adet",
+      "kategoriKod": "04",
+      "kategori": "Elektrik Tesisat"
+    },
+    {
+      "poz": "04.004",
+      "ad": "Jenerator",
+      "birim": "adet",
+      "kategoriKod": "04",
+      "kategori": "Elektrik Tesisat"
+    },
+    {
+      "poz": "04.005",
+      "ad": "Enerji Izleme",
+      "birim": "set",
+      "kategoriKod": "04",
+      "kategori": "Elektrik Tesisat"
+    },
+    {
+      "poz": "05.001",
+      "ad": "Mantolama",
+      "birim": "m2",
+      "kategoriKod": "05",
+      "kategori": "Dis Cephe"
+    },
+    {
+      "poz": "05.002",
+      "ad": "Cephe Kaplama",
+      "birim": "m2",
+      "kategoriKod": "05",
+      "kategori": "Dis Cephe"
+    },
+    {
+      "poz": "05.003",
+      "ad": "Dis Siva",
+      "birim": "m2",
+      "kategoriKod": "05",
+      "kategori": "Dis Cephe"
+    },
+    {
+      "poz": "05.004",
+      "ad": "Dis Boya",
+      "birim": "m2",
+      "kategoriKod": "05",
+      "kategori": "Dis Cephe"
+    },
+    {
+      "poz": "05.005",
+      "ad": "Iskele Kurulum",
+      "birim": "m2",
+      "kategoriKod": "05",
+      "kategori": "Dis Cephe"
+    },
+    {
+      "poz": "05.006",
+      "ad": "Iskele Sokum",
+      "birim": "m2",
+      "kategoriKod": "05",
+      "kategori": "Dis Cephe"
+    },
+    {
+      "poz": "06.001",
+      "ad": "Cevre Duzenlemesi",
+      "birim": "m2",
+      "kategoriKod": "06",
+      "kategori": "Peyzaj"
+    },
+    {
+      "poz": "06.002",
+      "ad": "Otopark",
+      "birim": "m2",
+      "kategoriKod": "06",
+      "kategori": "Peyzaj"
+    },
+    {
+      "poz": "06.003",
+      "ad": "Yurume Yolu",
+      "birim": "m2",
+      "kategoriKod": "06",
+      "kategori": "Peyzaj"
+    },
+    {
+      "poz": "06.004",
+      "ad": "Yesil Alan",
+      "birim": "m2",
+      "kategoriKod": "06",
+      "kategori": "Peyzaj"
+    },
+    {
+      "poz": "06.005",
+      "ad": "Dis Aydinlatma",
+      "birim": "adet",
+      "kategoriKod": "06",
+      "kategori": "Peyzaj"
+    },
+    {
+      "poz": "07.001",
+      "ad": "Boru Hatti",
+      "birim": "m",
+      "kategoriKod": "07",
+      "kategori": "Altyapi"
+    },
+    {
+      "poz": "07.002",
+      "ad": "Muayene Bacasi",
+      "birim": "adet",
+      "kategoriKod": "07",
+      "kategori": "Altyapi"
+    },
+    {
+      "poz": "07.003",
+      "ad": "Altyapi Tesisati",
+      "birim": "m",
+      "kategoriKod": "07",
+      "kategori": "Altyapi"
+    }
+  ],
+  "kullanicilar": [
+    {
+      "telegramId": "8520392049",
+      "ad": "inan üzümcü",
+      "rol": "SEF"
+    }
+  ],
+  "roller": [
+    {
+      "kod": "SEF",
+      "ad": "Santiye Sefi"
+    },
+    {
+      "kod": "MUD",
+      "ad": "Proje Muduru"
+    },
+    {
+      "kod": "TAS",
+      "ad": "Taseron Yoneticisi"
+    },
+    {
+      "kod": "UST",
+      "ad": "Usta/Kalfa"
+    },
+    {
+      "kod": "ISG",
+      "ad": "ISG Sorumlusu"
+    },
+    {
+      "kod": "KAL",
+      "ad": "Kalite Sorumlusu"
+    },
+    {
+      "kod": "DEPO",
+      "ad": "Depocu"
+    },
+    {
+      "kod": "SATIN",
+      "ad": "Satin Alma"
+    }
+  ],
+  "kodlar": {
+    "BETON_SINIF": [
+      {
+        "kod": "C20",
+        "ad": "Beton Sinifi C20"
+      },
+      {
+        "kod": "C25",
+        "ad": "Beton Sinifi C25"
+      },
+      {
+        "kod": "C30",
+        "ad": "Beton Sinifi C30"
+      },
+      {
+        "kod": "C35",
+        "ad": "Beton Sinifi C35"
+      },
+      {
+        "kod": "C40",
+        "ad": "Beton Sinifi C40"
+      }
+    ],
+    "SORUN_TIP": [
+      {
+        "kod": "KALITE",
+        "ad": "Kalite Uygunsuzluk"
+      },
+      {
+        "kod": "ISG",
+        "ad": "ISG Ihlali"
+      },
+      {
+        "kod": "TEKNIK",
+        "ad": "Teknik Sorun"
+      },
+      {
+        "kod": "MALZEME",
+        "ad": "Malzeme Hatasi"
+      },
+      {
+        "kod": "TASERON",
+        "ad": "Taseron Sorunu"
+      }
+    ],
+    "MLZ_HAREKET": [
+      {
+        "kod": "Giris",
+        "ad": "Malzeme Sahaya Girdi"
+      },
+      {
+        "kod": "Cikis",
+        "ad": "Malzeme Sahadan Cikti"
+      },
+      {
+        "kod": "Iade",
+        "ad": "Malzeme Iade Edildi"
+      }
+    ],
+    "DURUM": [
+      {
+        "kod": "Normal",
+        "ad": "Normal Saha Durumu"
+      },
+      {
+        "kod": "Gecikme",
+        "ad": "Program Gerisinde"
+      },
+      {
+        "kod": "Kritik",
+        "ad": "Kritik Gecikme"
+      },
+      {
+        "kod": "Tamamlandi",
+        "ad": "Tamamlandi"
+      }
+    ],
+    "VARDIYA": [
+      {
+        "kod": "Gunduz",
+        "ad": "07:00-17:00"
+      },
+      {
+        "kod": "Aksam",
+        "ad": "17:00-23:00"
+      },
+      {
+        "kod": "Gece",
+        "ad": "23:00-07:00"
+      }
+    ]
+  }
 }

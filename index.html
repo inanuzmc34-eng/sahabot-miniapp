@@ -1,218 +1,361 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Saha Yönetim Dashboard</title>
-    
-    <!-- Telegram WebApp -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Vue 3 -->
-    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Premium Styles -->
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Saha Takip</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app" v-cloak>
-        <!-- Güvenlik Ekranı (Telegram Dışı Giriş) -->
-        <div v-if="!isTelegramEnv && !devMode" class="auth-blocker">
-            <div class="glass-card full-center">
-                <div class="icon-warning">⚠️</div>
-                <h2>Erişim Engellendi</h2>
-                <p>Güvenlik politikası gereği bu uygulamaya tarayıcı üzerinden giriş yapılamaz.</p>
-                <p>Lütfen uygulamayı Telegram üzerinden açın.</p>
+<div id="app" v-cloak>
+
+  <!-- YÜKLENİYOR -->
+  <div v-if="yukleniyor" class="loader-wrap">
+    <div class="spinner"></div>
+    <p>Yükleniyor...</p>
+  </div>
+
+  <!-- ANA UYGULAMA -->
+  <div v-else class="app">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-left">
+        <button v-if="aktifModul" class="btn-back" @click="aktifModul = null">‹</button>
+        <span class="header-title">{{ aktifModul ? modulBaslik : '🏗 Saha Takip' }}</span>
+      </div>
+      <div class="header-right">
+        <span class="rol-badge" :class="'rol-' + kullanici.rol">{{ kullanici.rol || '?' }}</span>
+        <span class="kullanici-ad">{{ kullanici.ad }}</span>
+      </div>
+    </header>
+
+    <!-- ANA MENU (modül seçimi) -->
+    <main v-if="!aktifModul" class="menu-grid">
+      <button
+        v-for="m in gorunenmoduller"
+        :key="m.id"
+        class="modul-btn"
+        :class="'modul-' + m.renk"
+        @click="modulAc(m.id)"
+      >
+        <span class="modul-ikon">{{ m.ikon }}</span>
+        <span class="modul-ad">{{ m.ad }}</span>
+      </button>
+    </main>
+
+    <!-- FORM ALANI -->
+    <main v-else class="form-wrap">
+
+      <!-- ═══ İLERLEME FORMU ═══ -->
+      <form v-if="aktifModul === 'ilerleme'" @submit.prevent="gonder('ilerleme')" class="form">
+
+        <div class="form-group">
+          <label>Kategori</label>
+          <select v-model="f.kategoriKod" @change="f.kalem = ''" required>
+            <option value="">Seçiniz</option>
+            <option v-for="k in refs.kategoriler" :key="k.kod" :value="k.kod">{{ k.ad }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>İş Kalemi</label>
+          <select v-model="f.kalem" required :disabled="!f.kategoriKod">
+            <option value="">{{ f.kategoriKod ? 'Seçiniz' : 'Önce kategori seç' }}</option>
+            <option v-for="k in filtreliKalemler" :key="k.poz" :value="k.ad">
+              {{ k.ad }} ({{ k.birim }})
+            </option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Blok</label>
+            <select v-model="f.blok" required>
+              <option value="">Seç</option>
+              <option v-for="b in refs.bloklar" :key="b" :value="b">{{ b }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Kat</label>
+            <select v-model="f.kat" required>
+              <option value="">Seç</option>
+              <option v-for="k in refs.katlar" :key="k" :value="k">{{ k }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Taşeron</label>
+          <select v-model="f.taseron" required>
+            <option value="">Seçiniz</option>
+            <option v-for="t in refs.taseronlar" :key="t.kod" :value="t.ad">{{ t.ad }}</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Günlük Miktar</label>
+            <input type="number" v-model="f.gun_miktar" step="0.1" min="0" required placeholder="0">
+          </div>
+          <div class="form-group">
+            <label>Birim</label>
+            <input type="text" v-model="f.birim" placeholder="m2 / m3 / adet" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Plan Miktarı (toplam)</label>
+          <input type="number" v-model="f.plan_miktar" step="0.1" min="0" placeholder="0">
+        </div>
+
+        <div class="form-group">
+          <label>Not (opsiyonel)</label>
+          <textarea v-model="f.not_" placeholder="Açıklama..." rows="2"></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" :disabled="gonderiyor">
+          {{ gonderiyor ? 'Gönderiliyor...' : '✅ Kaydet' }}
+        </button>
+      </form>
+
+      <!-- ═══ PUANTAJ FORMU ═══ -->
+      <form v-if="aktifModul === 'puantaj'" @submit.prevent="gonder('puantaj')" class="form">
+
+        <div class="form-group">
+          <label>Taşeron</label>
+          <select v-model="f.taseron" required>
+            <option value="">Seçiniz</option>
+            <option v-for="t in refs.taseronlar" :key="t.kod" :value="t.ad">{{ t.ad }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>İş Kalemi / Grup</label>
+          <select v-model="f.kalem" required>
+            <option value="">Seçiniz</option>
+            <option v-for="k in refs.isKalemleri" :key="k.poz" :value="k.ad">{{ k.ad }}</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Blok</label>
+            <select v-model="f.blok">
+              <option value="">Seç</option>
+              <option v-for="b in refs.bloklar" :key="b" :value="b">{{ b }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Gelen Kişi</label>
+            <input type="number" v-model="f.gelen" min="0" required placeholder="0">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Giriş</label>
+            <input type="time" v-model="f.baslangic" value="08:00">
+          </div>
+          <div class="form-group">
+            <label>Çıkış</label>
+            <input type="time" v-model="f.bitis" value="17:00">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" :disabled="gonderiyor">
+          {{ gonderiyor ? 'Gönderiliyor...' : '✅ Kaydet' }}
+        </button>
+      </form>
+
+      <!-- ═══ SORUN / NCR FORMU ═══ -->
+      <form v-if="aktifModul === 'sorun'" @submit.prevent="gonder('sorun')" class="form">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Blok</label>
+            <select v-model="f.blok" required>
+              <option value="">Seç</option>
+              <option v-for="b in refs.bloklar" :key="b" :value="b">{{ b }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Kat</label>
+            <select v-model="f.kat">
+              <option value="">Seç</option>
+              <option v-for="k in refs.katlar" :key="k" :value="k">{{ k }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Sorun Tipi</label>
+          <select v-model="f.tip" required>
+            <option value="">Seçiniz</option>
+            <option v-for="s in sorunTipleri" :key="s.kod" :value="s.kod">{{ s.ad }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Açıklama</label>
+          <textarea v-model="f.aciklama" required placeholder="Sorunu açıklayın..." rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit btn-red" :disabled="gonderiyor">
+          {{ gonderiyor ? 'Gönderiliyor...' : '⚠️ Bildir' }}
+        </button>
+      </form>
+
+      <!-- ═══ MALZEME FORMU ═══ -->
+      <form v-if="aktifModul === 'malzeme'" @submit.prevent="gonder('malzeme')" class="form">
+
+        <div class="form-group">
+          <label>Hareket Tipi</label>
+          <div class="toggle-group">
+            <button type="button" :class="['toggle-btn', f.yon === 'Giris' ? 'active-green' : '']" @click="f.yon = 'Giris'">📥 Giriş</button>
+            <button type="button" :class="['toggle-btn', f.yon === 'Cikis' ? 'active-red' : '']"  @click="f.yon = 'Cikis'">📤 Çıkış</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Malzeme</label>
+          <select v-model="f.kalem" required>
+            <option value="">Seçiniz</option>
+            <option v-for="m in refs.malzemeler" :key="m.kod" :value="m.ad">
+              {{ m.ad }} ({{ m.birim }})
+            </option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Miktar</label>
+            <input type="number" v-model="f.miktar" step="0.01" min="0" required placeholder="0">
+          </div>
+          <div class="form-group">
+            <label>Birim</label>
+            <input type="text" v-model="f.birim" placeholder="m3 / ton / adet">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Not (opsiyonel)</label>
+          <input type="text" v-model="f.not_" placeholder="Tedarikçi, irsaliye no...">
+        </div>
+
+        <button type="submit" class="btn-submit" :disabled="gonderiyor">
+          {{ gonderiyor ? 'Gönderiliyor...' : '✅ Kaydet' }}
+        </button>
+      </form>
+
+      <!-- ═══ GÜNLÜK RAPOR FORMU ═══ -->
+      <form v-if="aktifModul === 'gunluk'" @submit.prevent="gonder('gunluk')" class="form">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Blok</label>
+            <select v-model="f.blok" required>
+              <option value="">Seç</option>
+              <option v-for="b in refs.bloklar" :key="b" :value="b">{{ b }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Kat</label>
+            <select v-model="f.kat">
+              <option value="">Seç</option>
+              <option v-for="k in refs.katlar" :key="k" :value="k">{{ k }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Yapılan İş</label>
+          <select v-model="f.imalat">
+            <option value="">Seçiniz</option>
+            <option v-for="k in refs.isKalemleri" :key="k.poz" :value="k.ad">{{ k.ad }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Taşeron</label>
+          <select v-model="f.taseron">
+            <option value="">Seçiniz</option>
+            <option v-for="t in refs.taseronlar" :key="t.kod" :value="t.ad">{{ t.ad }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Durum</label>
+          <select v-model="f.durum" required>
+            <option value="">Seçiniz</option>
+            <option v-for="d in durumKodlari" :key="d.kod" :value="d.kod">{{ d.ad }}</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-submit" :disabled="gonderiyor">
+          {{ gonderiyor ? 'Gönderiliyor...' : '✅ Kaydet' }}
+        </button>
+      </form>
+
+      <!-- ═══ @SAHABOT SORU FORMU ═══ -->
+      <form v-if="aktifModul === 'soru'" @submit.prevent="soruGonder" class="form">
+        <div class="form-group">
+          <label>@SahaBot'a Sor</label>
+          <textarea v-model="f.soru" required rows="4"
+            placeholder="Örn: A bloğu 3. katta hangi iş kalemleri tamamlandı?"></textarea>
+        </div>
+        <button type="submit" class="btn-submit btn-purple" :disabled="gonderiyor">
+          {{ gonderiyor ? 'Soruluyor...' : '🤖 Sor' }}
+        </button>
+        <div v-if="soruCevap" class="cevap-box">
+          <strong>Cevap:</strong>
+          <p>{{ soruCevap }}</p>
+        </div>
+      </form>
+
+      <!-- ═══ DURUM (dashboard) ═══ -->
+      <div v-if="aktifModul === 'durum'" class="dashboard">
+        <div v-if="yukleniyorDashboard" class="loader-wrap">
+          <div class="spinner"></div>
+        </div>
+        <div v-else>
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <span class="kpi-val">{{ ozet.personel || '—' }}</span>
+              <span class="kpi-lbl">Aktif Personel</span>
             </div>
+            <div class="kpi-card">
+              <span class="kpi-val text-green">{{ ozet.ilerleme || '—' }}</span>
+              <span class="kpi-lbl">Günlük İlerleme</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-val text-red">{{ ozet.acikSorun || '—' }}</span>
+              <span class="kpi-lbl">Açık NCR</span>
+            </div>
+          </div>
+          <div class="blok-listesi">
+            <div v-for="b in blokDurumlar" :key="b.blok" class="blok-kart">
+              <div class="blok-baslik">{{ b.blok }} Blok</div>
+              <div class="progress-bar">
+                <div class="progress-fill" :style="{width: (b.yuzde || 0) + '%'}"></div>
+              </div>
+              <span class="progress-text">%{{ b.yuzde || 0 }}</span>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <!-- Yükleniyor Ekranı -->
-        <div v-else-if="isLoading" class="loader-container full-center">
-            <div class="spinner"></div>
-            <p>Saha Verileri Yükleniyor...</p>
-        </div>
+    </main>
 
-        <!-- Ana Uygulama -->
-        <div v-else class="app-container">
-            
-            <!-- Navbar -->
-            <nav class="glass-nav">
-                <div class="nav-brand">
-                    <span class="emoji-logo">🏗️</span>
-                    <span class="brand-text">Saha<span class="gradient-text">Pro</span></span>
-                </div>
-                <!-- Tabs -->
-                <div class="nav-tabs">
-                    <button :class="['tab-btn', { active: currentTab === 'form' }]" @click="currentTab = 'form'">
-                        📝 Kayıt
-                    </button>
-                    <button :class="['tab-btn', { active: currentTab === 'dashboard' }]" @click="currentTab = 'dashboard'">
-                        📊 Durum
-                    </button>
-                    <button v-if="isAdmin" :class="['tab-btn', { active: currentTab === 'admin' }]" @click="currentTab = 'admin'">
-                        ⚙️ Admin
-                    </button>
-                </div>
-                <!-- Profile Pic / Name (Telegram data) -->
-                <div class="nav-profile">
-                    <img v-if="user.photo_url" :src="user.photo_url" alt="Avatar">
-                    <div class="user-info">
-                        <strong>{{ user.first_name || 'Misafir' }}</strong>
-                        <span class="user-role">{{ roleText }}</span>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- İçerik Alanı -->
-            <main class="content-area glass-panel">
-                
-                <!-- SEKME 1: Form (Kayıt) -->
-                <section v-show="currentTab === 'form'" class="fade-enter">
-                    <h2 class="section-title">Hızlı Veri Girişi</h2>
-                    
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Kategori</label>
-                            <select v-model="form.kategori">
-                                <option value="" disabled>Lütfen Seçiniz</option>
-                                <option value="ilerleme">📊 İlerleme / Metraj</option>
-                                <option value="puantaj">👷 Puantaj / Yevmiye</option>
-                                <option value="sorun">⚠️ Sorun / NCR Bildirimi</option>
-                                <option value="beton">🏗 Beton Dökümü</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Blok Seçimi</label>
-                            <select v-model="form.blok">
-                                <option value="" disabled>Lütfen Seçiniz</option>
-                                <option v-for="b in refs.bloklar" :key="b" :value="b">{{ b }}</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Kat Seçimi</label>
-                            <select v-model="form.kat">
-                                <option value="" disabled>Lütfen Seçiniz</option>
-                                <option v-for="k in refs.katlar" :key="k" :value="k">{{ k }}</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>İmalat / İş Kalemi</label>
-                            <select v-model="form.imalat">
-                                <option value="" disabled>İsteğe Bağlı</option>
-                                <option v-for="i in refs.imalatlar" :key="i" :value="i">{{ i }}</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group full-width" style="margin-top: 20px;">
-                        <label>Miktar ve Açıklama</label>
-                        <textarea v-model="form.miktar" placeholder="Örn: 22 m3 C30 Beton veya 5 Demirci..."></textarea>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label>Fotoğraf Eki (Orijinal Kayıt)</label>
-                        <div class="photo-upload" :class="{ 'has-file': photoFile }" @click="$refs.fileInput.click()">
-                            <span v-if="!photoFile">📸 Tıklayın: Kanıt / Durum Fotoğrafı Yükle</span>
-                            <span v-else>✅ Dosya Eklendi: {{ photoFile.name }} (Değiştir)</span>
-                        </div>
-                        <input type="file" ref="fileInput" accept="image/*" @change="handleFileUpload" style="display: none;">
-                    </div>
-
-                    <button class="btn-primary" @click="submitForm">
-                        <span class="btn-text">Veriyi Telegram ile İlet</span>
-                        <div class="btn-glow"></div>
-                    </button>
-                    
-                    <div v-if="!isOnline" class="offline-badge">
-                        ⚠️ Ağ bağlantısı zayıf. Şebeke bağlanınca gönderilecek.
-                    </div>
-                </section>
-
-                <!-- SEKME 2: Dashboard -->
-                <section v-show="currentTab === 'dashboard'" class="fade-enter">
-                    <h2 class="section-title">Anlık Saha Durumu (Özet)</h2>
-                    <div class="kpi-grid">
-                        <div class="kpi-card">
-                            <span class="kpi-value text-blue">214</span>
-                            <span class="kpi-label">Aktif Personel</span>
-                        </div>
-                        <div class="kpi-card">
-                            <span class="kpi-value text-green">14</span>
-                            <span class="kpi-label">Günlük İlerleme (m3/m2)</span>
-                        </div>
-                        <div class="kpi-card">
-                            <span class="kpi-value text-red">3</span>
-                            <span class="kpi-label">Açık Sorun (NCR)</span>
-                        </div>
-                    </div>
-
-                    <div class="coming-soon">
-                        <h3>Power BI Dashboard Entegrasyonu</h3>
-                        <p>Excel bağlantılı canlı grafikler bu ekranda görüntülenecektir.</p>
-                    </div>
-                </section>
-
-                <!-- SEKME 3: Admin Paneli (Sadece Şefler) -->
-                <section v-show="currentTab === 'admin' && isAdmin" class="fade-enter">
-                    <h2 class="section-title">Kullanıcı Yönetimi ve İzinler</h2>
-                    <p class="subtitle">Bu alanı sadece şantiye yetkilileri görüntüleyebilir.</p>
-
-                    <div class="user-list-card">
-                        <div class="toolbar">
-                            <h3>Personel & Taşeron Listesi</h3>
-                            <button class="btn-secondary" @click="fetchUsers">Yenile</button>
-                        </div>
-                        
-                        <div class="table-responsive">
-                            <table class="premium-table">
-                                <thead>
-                                    <tr>
-                                        <th>Ad Soyad</th>
-                                        <th>Telegram ID</th>
-                                        <th>Şantiye Rolü</th>
-                                        <th>Kayıt Onayı</th>
-                                        <th>İşlem</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(u, id) in adminUsers" :key="id">
-                                        <td>{{ u.name }}</td>
-                                        <td class="text-mono">{{ id }}</td>
-                                        <td>
-                                            <select v-model="u.role" @change="updateRole(id, u.role)">
-                                                <option value="SEF">Şantiye Şefi</option>
-                                                <option value="MUD">Proje Müdürü</option>
-                                                <option value="TAS">Taşeron Temsilcisi</option>
-                                                <option value="UST">Kalfa / Usta</option>
-                                                <option value="ISG">İSG Uzmanı</option>
-                                                <option value="KAL">Kalite Kontrol</option>
-                                                <option value="BEKLEYEN">Rol Bekleyen</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <span :class="u.approved ? 'status-green' : 'status-yellow'">
-                                                {{ u.approved ? 'Aktif' : 'Onay Bekliyor' }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <button v-if="!u.approved" class="btn-micro-green" @click="approveUser(id)">Onayla</button>
-                                        </td>
-                                    </tr>
-                                    <tr v-if="Object.keys(adminUsers).length === 0">
-                                        <td colspan="5" class="text-center text-muted">Ağdan veri çekiliyor...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-            </main>
-        </div>
+    <!-- OFFLINE BADGE -->
+    <div v-if="!online" class="offline-banner">
+      ⚠️ Çevrimdışı — veri telefonda saklanıyor
     </div>
-    <script src="app.js"></script>
+
+  </div>
+</div>
+<script src="app.js"></script>
 </body>
 </html>
