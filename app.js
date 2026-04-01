@@ -54,9 +54,11 @@ createApp({
     const blokDurumlar = ref([]);
 
     // ── Form state ────────────────────────────────────────────
+    const bugun = () => new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
     const _bos = () => ({
       // ortak
-      blok: '', kat: '', taseron: '',
+      blok: '', kat: '', taseron: '', tarih: bugun(),
       // ilerleme
       kategoriKod: '', kalem: '', gun_miktar: '', birim: '', plan_miktar: '', not_: '',
       // puantaj
@@ -64,12 +66,31 @@ createApp({
       // sorun
       tip: '', aciklama: '',
       // malzeme
-      yon: 'Giris', miktar: '',
+      yon: 'Giris', kalem: '', miktar: '', birim: '', not_: '',
       // gunluk
       imalat: '', durum: '',
+      // fotoğraf (çoklu)
+      fotolar: [],   // [{name, base64}]
       // soru
       soru: '',
     });
+
+    // ── Çoklu fotoğraf yönetimi ───────────────────────────────
+    const fotoEkle = (e) => {
+      const files = Array.from(e.target.files);
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          f.value.fotolar.push({ name: file.name, base64: ev.target.result });
+        };
+        reader.readAsDataURL(file);
+      });
+      e.target.value = ''; // aynı dosyayı tekrar seçebilmek için
+    };
+
+    const fotoCikar = (idx) => {
+      f.value.fotolar.splice(idx, 1);
+    };
     const f = ref(_bos());
 
     // ── Computed ──────────────────────────────────────────────
@@ -111,12 +132,20 @@ createApp({
       tg.expand();
       tg.ready();
 
+      // URL parametresiyle direkt modül aç (örn: ?mod=durum)
+      const urlMod = new URLSearchParams(window.location.search).get('mod');
+
       window.addEventListener('online',  () => { online.value = true;  _offlineGonder(); });
       window.addEventListener('offline', () => { online.value = false; });
 
       await _referansYukle();
       _rolBelirle();
       yukleniyor.value = false;
+
+      // URL'den gelen modülü aç
+      if (urlMod && MODULLER.find(m => m.id === urlMod)) {
+        modulAc(urlMod);
+      }
     });
 
     // ── Referans yükle ────────────────────────────────────────
@@ -185,7 +214,7 @@ createApp({
       const uid  = tg.initDataUnsafe?.user?.id || 0;
       const zaman = new Date().toISOString();
 
-      let payload = { action, user_id: uid, tarih: zaman };
+      let payload = { action, user_id: uid, tarih: f.value.tarih || zaman.split('T')[0], zaman };
 
       if (action === 'ilerleme') {
         if (!f.value.kalem || !f.value.blok || !f.value.kat || !f.value.gun_miktar) {
@@ -202,6 +231,7 @@ createApp({
           birim:       f.value.birim || kalemObj?.birim || 'adet',
           plan_miktar: parseFloat(f.value.plan_miktar) || 0,
           not_:        f.value.not_,
+          foto_sayisi: f.value.fotolar.length,
         };
       }
       else if (action === 'puantaj') {
@@ -226,7 +256,8 @@ createApp({
           blok:     f.value.blok,
           kat:      f.value.kat,
           tip:      f.value.tip,
-          aciklama: f.value.aciklama,
+          aciklama:    f.value.aciklama,
+          foto_sayisi: f.value.fotolar.length,
         };
       }
       else if (action === 'malzeme') {
@@ -315,6 +346,7 @@ createApp({
       filtreliKalemler, sorunTipleri, durumKodlari,
       gonder, soruGonder, soruCevap,
       ozet, blokDurumlar, yukleniyorDashboard,
+      fotoEkle, fotoCikar,
     };
   }
 }).mount('#app');

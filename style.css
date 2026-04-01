@@ -240,6 +240,33 @@ input[type="time"] { cursor: pointer; }
   float: right; margin-top: 4px;
 }
 
+/* ── ÇOKLU FOTOĞRAF ─────────────────────────────────────────── */
+.foto-ekle-btn {
+  display: inline-block; padding: 10px 16px;
+  background: var(--surface); border: 1.5px dashed var(--accent);
+  border-radius: var(--radius-sm); color: var(--accent);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  text-align: center; width: 100%;
+}
+.foto-ekle-btn:active { opacity: .7; }
+
+.foto-onizleme {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
+}
+.foto-item {
+  position: relative; width: 80px; height: 80px;
+  border-radius: var(--radius-sm); overflow: hidden;
+  border: 1.5px solid var(--border);
+}
+.foto-item img { width: 100%; height: 100%; object-fit: cover; }
+.foto-sil {
+  position: absolute; top: 2px; right: 2px;
+  background: rgba(0,0,0,.6); color: #fff;
+  border: none; border-radius: 50%;
+  width: 20px; height: 20px; font-size: 11px;
+  cursor: pointer; line-height: 20px; text-align: center; padding: 0;
+}
+
 /* ── OFFLINE BANNER ──────────────────────────────────────────── */
 .offline-banner {
   position: fixed; bottom: 0; left: 0; right: 0;

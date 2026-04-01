@@ -53,6 +53,11 @@
       <form v-if="aktifModul === 'ilerleme'" @submit.prevent="gonder('ilerleme')" class="form">
 
         <div class="form-group">
+          <label>Tarih</label>
+          <input type="date" v-model="f.tarih" required>
+        </div>
+
+        <div class="form-group">
           <label>Kategori</label>
           <select v-model="f.kategoriKod" @change="f.kalem = ''" required>
             <option value="">Seçiniz</option>
@@ -116,6 +121,21 @@
           <textarea v-model="f.not_" placeholder="Açıklama..." rows="2"></textarea>
         </div>
 
+        <!-- Çoklu Fotoğraf -->
+        <div class="form-group">
+          <label>Fotoğraf (opsiyonel, çoklu)</label>
+          <label class="foto-ekle-btn">
+            📸 Fotoğraf Ekle
+            <input type="file" accept="image/*" multiple @change="fotoEkle" style="display:none">
+          </label>
+          <div v-if="f.fotolar.length" class="foto-onizleme">
+            <div v-for="(foto, i) in f.fotolar" :key="i" class="foto-item">
+              <img :src="foto.base64" alt="">
+              <button type="button" @click="fotoCikar(i)" class="foto-sil">✕</button>
+            </div>
+          </div>
+        </div>
+
         <button type="submit" class="btn-submit" :disabled="gonderiyor">
           {{ gonderiyor ? 'Gönderiliyor...' : '✅ Kaydet' }}
         </button>
@@ -123,6 +143,11 @@
 
       <!-- ═══ PUANTAJ FORMU ═══ -->
       <form v-if="aktifModul === 'puantaj'" @submit.prevent="gonder('puantaj')" class="form">
+
+        <div class="form-group">
+          <label>Tarih</label>
+          <input type="date" v-model="f.tarih" required>
+        </div>
 
         <div class="form-group">
           <label>Taşeron</label>
@@ -173,6 +198,11 @@
       <!-- ═══ SORUN / NCR FORMU ═══ -->
       <form v-if="aktifModul === 'sorun'" @submit.prevent="gonder('sorun')" class="form">
 
+        <div class="form-group">
+          <label>Tarih</label>
+          <input type="date" v-model="f.tarih" required>
+        </div>
+
         <div class="form-row">
           <div class="form-group">
             <label>Blok</label>
@@ -203,6 +233,21 @@
           <textarea v-model="f.aciklama" required placeholder="Sorunu açıklayın..." rows="3"></textarea>
         </div>
 
+        <!-- Sorun fotoğrafı (çoklu) -->
+        <div class="form-group">
+          <label>Fotoğraf (kanıt, çoklu)</label>
+          <label class="foto-ekle-btn">
+            📸 Fotoğraf Ekle
+            <input type="file" accept="image/*" multiple @change="fotoEkle" style="display:none">
+          </label>
+          <div v-if="f.fotolar.length" class="foto-onizleme">
+            <div v-for="(foto, i) in f.fotolar" :key="i" class="foto-item">
+              <img :src="foto.base64" alt="">
+              <button type="button" @click="fotoCikar(i)" class="foto-sil">✕</button>
+            </div>
+          </div>
+        </div>
+
         <button type="submit" class="btn-submit btn-red" :disabled="gonderiyor">
           {{ gonderiyor ? 'Gönderiliyor...' : '⚠️ Bildir' }}
         </button>
@@ -210,6 +255,11 @@
 
       <!-- ═══ MALZEME FORMU ═══ -->
       <form v-if="aktifModul === 'malzeme'" @submit.prevent="gonder('malzeme')" class="form">
+
+        <div class="form-group">
+          <label>Tarih</label>
+          <input type="date" v-model="f.tarih" required>
+        </div>
 
         <div class="form-group">
           <label>Hareket Tipi</label>
@@ -252,6 +302,11 @@
 
       <!-- ═══ GÜNLÜK RAPOR FORMU ═══ -->
       <form v-if="aktifModul === 'gunluk'" @submit.prevent="gonder('gunluk')" class="form">
+
+        <div class="form-group">
+          <label>Tarih</label>
+          <input type="date" v-model="f.tarih" required>
+        </div>
 
         <div class="form-row">
           <div class="form-group">
